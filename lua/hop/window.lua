@@ -65,6 +65,7 @@ function M.get_window_context(multi_windows)
 
   for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
     local b = vim.api.nvim_win_get_buf(w)
+    if vim.api.nvim_win_is_valid(w)==true then
     if w ~= cur_hwin then
 
       -- check duplicated buffers; the way this is done is by accessing all the already known contexts and checking that
@@ -80,12 +81,16 @@ function M.get_window_context(multi_windows)
       if bctx then
         bctx[#bctx + 1] = window_context(w, vim.api.nvim_win_get_cursor(w))
       else
+        local ok ,res = pcall(window_context, w, vim.api.nvim_win_get_cursor(w) )
+        if ok == true then
         all_ctxs[#all_ctxs + 1] = {
           hbuf = b,
-          contexts = { window_context(w, vim.api.nvim_win_get_cursor(w)) }
+          contexts = {res}
         }
       end
+      end
 
+    end
     end
   end
 
